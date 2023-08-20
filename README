@@ -36,6 +36,11 @@ We can control each log level independently using LOG_LEVEl (for console) and LO
 
 And since the exercise requested a run time way to change the level, there is a setLogLevelDuringRuntime on the interface. Than can be used to change the level for the place the logger is injected in. That is also exemplified in the seeLoggerInAction command
 
+
+Do we have unit tests? Yes:
+We can run like this: php vendor/bin/codecept run Unit
+
+
 Notes and specific details:
 
 1. Why multiple consts exists?
@@ -59,6 +64,7 @@ L - the dependency is on the interface, each of the classes that implement it ca
 I - this one was interesting to exemplify in such a small example, but we can take a look at LoggerInterface and LoggerSetter interface and their usages
 D - this one I think is fairly obvious; all dependencies are on interfaces, not on the implementations
 
+6. I added a single unit test example for the ConsoleLogger. The EmailLogger would be similar.
 
 Extra note based on task:
 1. Consider performance. A logger could go through some very heavy usage depending on which team uses it.
