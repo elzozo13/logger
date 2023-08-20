@@ -1,19 +1,27 @@
-The reason this LEVELS_AS_STRING exists is that it makes it easier in the implementation to deal with places we need to display the strings.
-The base constants exist because they make it easier to deal with what we display (if log level is info, we display everything is above info, etc., so having this as numeric helps).
-
+Choices and project:
+-> I choose php 8.0 + symfony 6.3 for this particular lib. The framework is not mandatory and this can be easily converted to a pure php lib, but I used it because it makes it has autowire and the output interface that makes things clear and easy.
+-> I didn't log the stack trace since from what I understand from the text is a custom logger for specific usages.
 
 How to include the lib:
 The lib can be converted to a bundle and be included anywhere. In order to be used, the LoggerInterface needs to be injected (DI) wherever is needed. I created a command to exemplify that.
+
+Prerequisites:
+PHP 8.2+
+Compsoser 2 (should work on 1 also but didn't test)
+
+Right now is set as a standalone project, in order to use pls:
+1. Clone the repo
+2. Run composer install
 
 How to use the test command:
 In order to use the test command the following can be run:
 $ ./bin/console logger:seeLoggerInAction
 
-You should see an output with warning and error messages (unless different log level was specified, see below)
+We should see an output with warning and error messages (unless different log level was specified, see below)
 
 Log level:
 By default, the log level is 2 (warning level)
-In order to change that you can set an env variable for LOG_LEVEL to the level you want (0 to 3, from DEBUG to ERROR).
+In order to change that we can set an env variable for LOG_LEVEL to the level we want (0 to 3, from DEBUG to ERROR).
 
 By default, the log level for email is 3 (error level)
 
@@ -21,9 +29,53 @@ Assuming Linux env:
 
 Example on how to set env var: export LOG_LEVEL=1
 
-You can also run the command like:
+We can also run the command like:
 LOG_LEVEL=3 LOG_LEVEL_EMAIL=1 ./bin/console logger:seeLoggerInAction
 
-You can control each log level independently using LOG_LEVEl (for console) and LOG_LEVEL_EMAIL (for email - that is also a console :D)
+We can control each log level independently using LOG_LEVEl (for console) and LOG_LEVEL_EMAIL (for email - that is also a console :D)
 
 And since the exercise requested a run time way to change the level, there is a setLogLevelDuringRuntime on the interface. Than can be used to change the level for the place the logger is injected in. That is also exemplified in the seeLoggerInAction command
+
+Notes and specific details:
+
+1. Why multiple consts exists?
+The reason this LEVELS_AS_STRING exists is that it makes it easier in the implementation to deal with places we need to display the strings.
+The base constants exist because they make it easier to deal with what we display (if log level is info, we display everything is above info, etc., so having this as numeric helps).
+
+2. Why both an abstract and an interface?
+The interface is there to ensure a specific structure of the loggers (all for example must have the log function). The abstract is there because we have same implementation for the setLogLevelDuringRuntime and for the constructor. Without it we would duplicate stuff.
+
+3. What to do if we need an extra logger?
+Just implement the interface, and add it in services for autowire (the abstract is not mandatory)
+
+4. How does it work, how are there 2 different loggers in the example although the same interface is used?
+Take a look in services.yaml, at _defaults. While using _defaults is not the best idea in general, for this simple example it is perfect.
+
+5. Why is this clean and solid?
+Well... lets take a look
+S - each class only takes care of its own stuff (in this case formatting the message and logging it)
+O - we can extend any of the loggers with the particularities we need
+L - the dependency is on the interface, each of the classes that implement it can be used with the same result, without altering any code
+I - this one was interesting to exemplify in such a small example, but we can take a look at LoggerInterface and LoggerSetter interface and their usages
+D - this one I think is fairly obvious; all dependencies are on interfaces, not on the implementations
+
+
+Extra note based on task:
+1. Consider performance. A logger could go through some very heavy usage depending on which team uses it.
+Well... yes. For the current example I didn't do this, but there are a couple of ways to improve performance (they have drawbacks however). For example we could compute multiple logs in ram and flush them to (whatever output) all at once. But this have a drawback in the fact that if something fully crashes in between... we loose the logs.
+There is an additional point for this regarding grouping below.
+
+2. Proper management in a multi threading environment.
+I used php so is not much of a concern (since is single thread). For multi-thread envs we need to take care of a possible resource race to the log level.
+
+3. Consider how and where we could make this Logger more open to modification.
+The current implementation is open to modification. In many ways :).
+
+4. Give us your own ideas on how to improve this.
+First of all we should treat the fatals somehow (since there is a good chance for that to stop the logging process), this can be done in multiple ways (starting from a destruct on kernel - that is still not 100% safe), to an external monitoring.
+Second we can improve performance by logging async (maybe a queueing system?). This only worth if logs are big.
+
+5. Any improvements to the code that could simplify our Big O notation of every method? Any ways to remove loops, if, switches.
+The only thing that can actually be improved imo is the LEVELS_AS_STRING, and its call in the loop in ConsoleLogger. This can be esily replaced with a constant, reducing everything to an O(1). However, I choose to leave it like that because it helps maintenance (adding a new lvl for ex), and in practice we are talking about nano/picoseconds to iterate through 4 elements, the impact of it can be considered 0 in a real life scenario compared to anything else the script does.
+
+

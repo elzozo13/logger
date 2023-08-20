@@ -5,7 +5,7 @@ namespace App\Service\Logger;
 use LogicException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class AbstractLogger
+class AbstractLogger implements LoggerLevelSetterInterface
 {
     protected int $logLevel;
     protected string $logLevelParamName = 'log_level';

@@ -2,7 +2,7 @@
 
 namespace App\Service\Logger;
 
-interface LoggerInterface
+interface LoggerInterface extends LoggerLevelSetterInterface
 {
     public const LEVEL_DEBUG = 0;
     public const LEVEL_INFO = 1;
@@ -17,5 +17,4 @@ interface LoggerInterface
     ];
 
     public function log(string $message, int $level): void;
-    public function setLogLevelDuringRuntime(int $level): static;
 }
