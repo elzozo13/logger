@@ -7,7 +7,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-class ConsoleLogger implements LoggerInterface
+class ConsoleLogger extends AbstractLogger implements LoggerInterface
 {
     /** @var string[] */
     protected array $messageColorsByLevel = [
@@ -17,14 +17,10 @@ class ConsoleLogger implements LoggerInterface
         self::LEVEL_ERROR => '#c30010',
     ];
 
-    protected int $logLevel;
-
     private const STYLE = 'style';
 
     public function __construct(ParameterBagInterface $parameterBag, protected OutputInterface $output) {
-        /** @var String|Int $levelParam */
-        $levelParam = $parameterBag->get('log_level');
-        $this->logLevel = (int) $levelParam;
+        parent::__construct($parameterBag);
     }
 
     public function log(string $message, int $level): void
@@ -37,13 +33,6 @@ class ConsoleLogger implements LoggerInterface
         $outputStyle = new OutputFormatterStyle($this->messageColorsByLevel[$level]);
         $this->output->getFormatter()->setStyle(self::STYLE, $outputStyle);
         $this->output->writeln($displayMessage);
-    }
-
-    public function setLogLevelDuringRuntime(int $level): static
-    {
-        $this->logLevel = $level;
-
-        return $this;
     }
 
     protected function formatDisplayMessage(string $message, int $level): string

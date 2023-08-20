@@ -11,24 +11,39 @@ class SeeLoggerInActionCommand extends Command
 {
     protected string $name = 'logger:seeLoggerInAction';
 
-    public function __construct(private LoggerInterface $logger) {
+    public function __construct(private LoggerInterface $consoleLogger, private LoggerInterface $emailLogger) {
         parent::__construct($this->name);
     }
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->logger->log('This is a debug message', LoggerInterface::LEVEL_DEBUG);
-        $this->logger->log('---------------------------------------------', LoggerInterface::LEVEL_DEBUG);
-        $this->logger->log('This is an info message', LoggerInterface::LEVEL_INFO);
-        $this->logger->log('---------------------------------------------', LoggerInterface::LEVEL_INFO);
-        $this->logger->log('This is a warning message', LoggerInterface::LEVEL_WARNING);
-        $this->logger->log('---------------------------------------------', LoggerInterface::LEVEL_WARNING);
-        $this->logger->log('This is an error message', LoggerInterface::LEVEL_ERROR);
-        $this->logger->log('---------------------------------------------', LoggerInterface::LEVEL_ERROR);
+        $this->consoleLogger->log('This is a debug message', LoggerInterface::LEVEL_DEBUG);
+        $this->consoleLogger->log('---------------------------------------------', LoggerInterface::LEVEL_DEBUG);
+        $this->consoleLogger->log('This is an info message', LoggerInterface::LEVEL_INFO);
+        $this->consoleLogger->log('---------------------------------------------', LoggerInterface::LEVEL_INFO);
+        $this->consoleLogger->log('This is a warning message', LoggerInterface::LEVEL_WARNING);
+        $this->consoleLogger->log('---------------------------------------------', LoggerInterface::LEVEL_WARNING);
+        $this->consoleLogger->log('This is an error message', LoggerInterface::LEVEL_ERROR);
+        $this->consoleLogger->log('---------------------------------------------', LoggerInterface::LEVEL_ERROR);
 
-        $this->logger->setLogLevelDuringRuntime(LoggerInterface::LEVEL_ERROR);
-        $this->logger->log('You will not see this', LoggerInterface::LEVEL_WARNING);
-        $this->logger->log('You will see this because is an error', LoggerInterface::LEVEL_ERROR);
+        $this->consoleLogger->setLogLevelDuringRuntime(LoggerInterface::LEVEL_ERROR);
+        $this->consoleLogger->log('You will not see this', LoggerInterface::LEVEL_WARNING);
+        $this->consoleLogger->log('You will see this because is an error', LoggerInterface::LEVEL_ERROR);
+
+        $this->emailLogger->log('---------------------------------------------', LoggerInterface::LEVEL_ERROR);
+        $this->emailLogger->log('This is a debug message', LoggerInterface::LEVEL_DEBUG);
+        $this->emailLogger->log('---------------------------------------------', LoggerInterface::LEVEL_DEBUG);
+        $this->emailLogger->log('This is an info message', LoggerInterface::LEVEL_INFO);
+        $this->emailLogger->log('---------------------------------------------', LoggerInterface::LEVEL_INFO);
+        $this->emailLogger->log('This is a warning message', LoggerInterface::LEVEL_WARNING);
+        $this->emailLogger->log('---------------------------------------------', LoggerInterface::LEVEL_WARNING);
+        $this->emailLogger->log('This is an error message', LoggerInterface::LEVEL_ERROR);
+        $this->emailLogger->log('---------------------------------------------', LoggerInterface::LEVEL_ERROR);
+
+        $this->emailLogger->setLogLevelDuringRuntime(LoggerInterface::LEVEL_ERROR);
+        $this->emailLogger->log('You will not see this', LoggerInterface::LEVEL_WARNING);
+        $this->emailLogger->log('You will see this because is an error', LoggerInterface::LEVEL_ERROR);
+
 
         return self::SUCCESS;
     }

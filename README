@@ -15,11 +15,15 @@ Log level:
 By default, the log level is 2 (warning level)
 In order to change that you can set an env variable for LOG_LEVEL to the level you want (0 to 3, from DEBUG to ERROR).
 
+By default, the log level for email is 3 (error level)
+
 Assuming Linux env:
 
 Example on how to set env var: export LOG_LEVEL=1
 
 You can also run the command like:
-LOG_LEVEL=3 ./bin/console logger:seeLoggerInAction
+LOG_LEVEL=3 LOG_LEVEL_EMAIL=1 ./bin/console logger:seeLoggerInAction
+
+You can control each log level independently using LOG_LEVEl (for console) and LOG_LEVEL_EMAIL (for email - that is also a console :D)
 
 And since the exercise requested a run time way to change the level, there is a setLogLevelDuringRuntime on the interface. Than can be used to change the level for the place the logger is injected in. That is also exemplified in the seeLoggerInAction command
