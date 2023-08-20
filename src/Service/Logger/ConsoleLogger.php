@@ -17,16 +17,33 @@ class ConsoleLogger implements LoggerInterface
         self::LEVEL_ERROR => '#c30010',
     ];
 
+    protected int $logLevel;
+
     private const STYLE = 'style';
 
-    public function __construct(protected ParameterBagInterface $parameterBag, protected OutputInterface $output) {}
+    public function __construct(ParameterBagInterface $parameterBag, protected OutputInterface $output) {
+        /** @var String|Int $levelParam */
+        $levelParam = $parameterBag->get('log_level');
+        $this->logLevel = (int) $levelParam;
+    }
 
     public function log(string $message, int $level): void
     {
+        if ($level < $this->logLevel) {
+            return;
+        }
+
         $displayMessage = $this->formatDisplayMessage($message, $level);
         $outputStyle = new OutputFormatterStyle($this->messageColorsByLevel[$level]);
         $this->output->getFormatter()->setStyle(self::STYLE, $outputStyle);
         $this->output->writeln($displayMessage);
+    }
+
+    public function setLogLevelDuringRuntime(int $level): static
+    {
+        $this->logLevel = $level;
+
+        return $this;
     }
 
     protected function formatDisplayMessage(string $message, int $level): string

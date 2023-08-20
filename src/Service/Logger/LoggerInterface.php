@@ -17,4 +17,5 @@ interface LoggerInterface
     ];
 
     public function log(string $message, int $level): void;
+    public function setLogLevelDuringRuntime(int $level): static;
 }
