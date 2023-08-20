@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ConsoleLogger implements LoggerInterface
 {
+    /** @var string[] */
     protected array $messageColorsByLevel = [
         self::LEVEL_DEBUG => '#cccccc',
         self::LEVEL_INFO => '#77ccff',
@@ -28,7 +29,7 @@ class ConsoleLogger implements LoggerInterface
         $this->output->writeln($displayMessage);
     }
 
-    protected function formatDisplayMessage(string $message, $level): string
+    protected function formatDisplayMessage(string $message, int $level): string
     {
         $currentTime = new DateTimeImmutable();
 
